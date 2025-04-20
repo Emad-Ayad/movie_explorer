@@ -8,22 +8,31 @@ part 'movies_state.dart';
 class MoviesCubit extends Cubit<MoviesState> {
   MoviesCubit(this.moviesRepo) : super(MoviesInitial());
   final MoviesRepo moviesRepo;
+  List<Movie> _cachedMovies = [];
 
   Future<void> getPopularMovies() async {
+    if (_cachedMovies.isNotEmpty) {
+      emit(MoviesSuccess(_cachedMovies));
+      return;
+    }
+
     emit(MoviesLoading());
     final result = await moviesRepo.getPopularMovies();
     result.fold(
-      (failure) => emit(MoviesFailure(failure.errMessage)),
-      (movies) => emit(MoviesSuccess(movies)),
+          (failure) => emit(MoviesFailure(failure.errMessage)),
+          (movies) {
+        _cachedMovies = movies;
+        emit(MoviesSuccess(movies));
+      },
     );
   }
 
   Future<void> getMovieDetails(int movieId) async {
-    emit(MoviesLoading());
+    emit(DetailsLoading());
     final result = await moviesRepo.getMovieDetails(movieId: movieId);
     result.fold(
-      (failure) => emit(MoviesFailure(failure.errMessage)),
-      (movie) => emit(DetailsMoviesSuccess(movie)),
+      (failure) => emit(DetailsFailure(failure.errMessage)),
+      (movie) => emit(DetailsSuccess(movie)),
     );
   }
 

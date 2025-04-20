@@ -3,24 +3,31 @@ part of 'movies_cubit.dart';
 @immutable
 sealed class MoviesState {}
 
-final class MoviesInitial extends MoviesState {}
+class MoviesInitial extends MoviesState {}
 
-final class MoviesLoading extends MoviesState {}
+class MoviesLoading extends MoviesState {}
 
-final class MoviesSuccess extends MoviesState {
+class MoviesSuccess extends MoviesState {
   final List<Movie> movies;
-
   MoviesSuccess(this.movies);
 }
 
-final class DetailsMoviesSuccess extends MoviesState {
-  final Movie movie;
-
-  DetailsMoviesSuccess(this.movie);
-}
-
-final class MoviesFailure extends MoviesState {
+class MoviesFailure extends MoviesState {
   final String message;
-
   MoviesFailure(this.message);
 }
+
+class DetailsLoading extends MoviesState {}
+
+class DetailsSuccess extends MoviesState {
+  final Movie movie;
+  DetailsSuccess(this.movie);
+}
+
+class DetailsFailure extends MoviesState {
+  final String message;
+  DetailsFailure(this.message);
+}
+
+
+
