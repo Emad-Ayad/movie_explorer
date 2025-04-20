@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'core/helper/routes_generator.dart';
+import 'core/services/get_it.dart';
 import 'features/auth/view/login_view.dart';
 
 void main() {
+  setup();
   runApp(const MyApp());
 }
 
