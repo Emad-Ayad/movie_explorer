@@ -18,8 +18,22 @@ class _HomeViewBodyState extends State<HomeViewBody> {
 
   @override
   void initState() {
-    super.initState();
     context.read<MoviesCubit>().getPopularMovies();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (query.isEmpty) {
+      context.read<MoviesCubit>().getPopularMovies();
+    } else {
+      context.read<MoviesCubit>().searchMovies(query);
+    }
   }
 
   @override
@@ -31,6 +45,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
           children: [
             CustomSearchTextField(
               searchController: searchController,
+              onChanged: _onSearchChanged,
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -41,12 +56,19 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(state.message),
+                          Text("Movie not found please try again"),
                           const SizedBox(height: 16),
                           //for testing
                           ElevatedButton(
-                            onPressed: () =>
-                                context.read<MoviesCubit>().getPopularMovies(),
+                            onPressed: () {
+                              searchController.text.isEmpty
+                                  ? context
+                                      .read<MoviesCubit>()
+                                      .getPopularMovies()
+                                  : context
+                                      .read<MoviesCubit>()
+                                      .searchMovies(searchController.text);
+                            },
                             child: const Text('Retry'),
                           ),
                         ],
@@ -59,10 +81,10 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       itemCount: state.movies.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.65,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.65,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
                       ),
                       itemBuilder: (context, index) {
                         return GestureDetector(
@@ -70,7 +92,8 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                             Navigator.pushNamed(
                               context,
                               DetailsView.routeName,
-                              arguments: state.movies[index], // Pass the whole movie
+                              arguments:
+                                  state.movies[index],
                             );
                           },
                           child: MovieItem(

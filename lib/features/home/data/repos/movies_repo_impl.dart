@@ -42,4 +42,23 @@ class MovieRepoImpl extends MoviesRepo {
       return Left(Failure(errMessage: 'Unexpected error: $e'));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Movie>>> searchMovies(String query) async {
+    try {
+      final response = await apiService.searchMovies(query);
+      final movies = (response['results'] as List)
+          .map((json) => Movie.fromJson(json))
+          .toList();
+      return right(movies);
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          errMessage: 'Failed to load search movies: ${e.message}',
+        ),
+      );
+    } catch (e) {
+      return Left(Failure(errMessage: 'Unexpected error: $e'));
+    }
+  }
 }

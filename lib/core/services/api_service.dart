@@ -7,19 +7,6 @@ class ApiService {
 
   ApiService({required this.dio});
 
-  // Future<Map<String, dynamic>> get({
-  //   required String endPoint,
-  //   int? movieId,
-  //   String? query
-  // }) async {
-  //   var response = await dio.get(
-  //     "$_baseUrl$endPoint",
-  //     queryParameters: {'api_key': apiKey,},
-  //   );
-  //   return response.data;
-  // }
-
-  // Get popular movies
   Future<Map<String, dynamic>> getMovies({
     String? endPoint,
     int? movieId,
@@ -52,20 +39,25 @@ class ApiService {
     }
   }
 
-
-  //
-  // // Search movies
-  //  Future<List<Movie>> searchMovies(String query) async {
-  //   try {
-  //     final response = await _dio.get(
-  //       'https://api.themoviedb.org/3/search/movie',
-  //       queryParameters: {'api_key': _apiKey, 'query': query},
-  //     );
-  //     return (response.data['results'] as List)
-  //         .map((json) => Movie.fromJson(json))
-  //         .toList();
-  //   } catch (e) {
-  //     throw Exception('Failed to search movies: $e');
-  //   }
-  // }
+  Future<Map<String, dynamic>> searchMovies(String query) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/search/movie',
+        queryParameters: {
+          'api_key': apiKey,
+          'query': query,
+        },
+      );
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

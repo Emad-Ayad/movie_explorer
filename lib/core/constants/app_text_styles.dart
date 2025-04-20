@@ -27,7 +27,7 @@ abstract class AppTextStyles {
   static const TextStyle subtitle1 = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w600,
-    color: Colors.black87,
+    color: Colors.white,
   );
 
   static const TextStyle subtitle2 = TextStyle(
@@ -46,7 +46,7 @@ abstract class AppTextStyles {
   static const TextStyle bodyText2 = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.normal,
-    color: Colors.black87,
+    color: Colors.white70,
   );
 
   static TextStyle bodyTextShade = TextStyle(
@@ -71,9 +71,15 @@ abstract class AppTextStyles {
 
   // Custom styles for specific use cases
   static const TextStyle highlightedText = TextStyle(
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: Colors.amber,
+    color: Colors.white,
+  );
+
+  static const TextStyle highlightedText1 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    color: Colors.white70,
   );
 
   static const TextStyle errorText = TextStyle(
