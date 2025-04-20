@@ -20,7 +20,7 @@ class _LoginViewBodyState extends State<LoginViewBody> {
   late String email, password;
 
   bool _isFormValid = false;
-  bool loading = false;
+  bool _loading = false;
 
   void _validateForm() {
     setState(() {
@@ -32,7 +32,7 @@ class _LoginViewBodyState extends State<LoginViewBody> {
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
-      inAsyncCall: loading,
+      inAsyncCall: _loading,
       child: Stack(
         children: [
           Image.asset(
@@ -41,18 +41,18 @@ class _LoginViewBodyState extends State<LoginViewBody> {
             "assets/sky.jpg",
             fit: BoxFit.fill,
           ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              child: Form(
-                key: _globalKey,
-                autovalidateMode: _autoValidateMode,
-                onChanged: _validateForm,
-                child: SafeArea(
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: Form(
+                  key: _globalKey,
+                  autovalidateMode: _autoValidateMode,
+                  onChanged: _validateForm,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 128),
                       Text(
                         "Movie Explorer",
                         style: AppTextStyles.heading1,
@@ -62,7 +62,7 @@ class _LoginViewBodyState extends State<LoginViewBody> {
                         "Discover and explore your favorite movies",
                         style: AppTextStyles.subtitle2,
                       ),
-                      const SizedBox(height: 64),
+                      const SizedBox(height: 48),
                       CustomTextFormField(
                         onSaved: (value) {
                           email = value!;
@@ -81,12 +81,12 @@ class _LoginViewBodyState extends State<LoginViewBody> {
                       CustomButton(
                         onPressed: () {
                           if (_globalKey.currentState!.validate()) {
-                            loading = true;
+                            _loading = true;
                             setState(() {});
                             Future.delayed(
                               const Duration(seconds: 3),
                               () {
-                                loading = false;
+                                _loading = false;
                                 setState(() {});
                                 Navigator.pushReplacementNamed(context, HomeView.routeName);
                               },
