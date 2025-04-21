@@ -15,12 +15,38 @@ Route<dynamic> routerGenerator(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const HomeView());
 
     case DetailsView.routeName:
-      final movie = settings.arguments as Movie; // Cast the passed movie
-      return MaterialPageRoute(
-        builder: (_) => DetailsView(movie: movie), // No Cubit needed
+      final movieId = settings.arguments as int?;
+      if (movieId == null) {
+        return _buildErrorRoute(settings, 'Missing movieId parameter');
+      }
+      return _buildRoute(
+        settings,
+        DetailsView(movieId: movieId),
+        maintainState: true,
       );
 
     default:
       return MaterialPageRoute(builder: (context) => const Scaffold());
   }
+}
+
+MaterialPageRoute _buildRoute(
+    RouteSettings settings,
+    Widget builder, {
+      bool maintainState = false,
+    }) {
+  return MaterialPageRoute(
+    settings: settings, // Preserve original settings
+    builder: (_) => builder,
+    maintainState: maintainState,
+  );
+}
+
+MaterialPageRoute _buildErrorRoute(RouteSettings settings, String message) {
+  return MaterialPageRoute(
+    builder: (_) => Scaffold(
+      appBar: AppBar(title: const Text('Error')),
+      body: Center(child: Text(message)),
+    ),
+  );
 }

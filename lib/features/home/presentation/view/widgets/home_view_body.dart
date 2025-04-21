@@ -18,22 +18,14 @@ class _HomeViewBodyState extends State<HomeViewBody> {
 
   @override
   void initState() {
-    context.read<MoviesCubit>().getPopularMovies();
     super.initState();
+    context.read<MoviesCubit>().getPopularMovies();
   }
 
   @override
   void dispose() {
     searchController.dispose();
     super.dispose();
-  }
-
-  void _onSearchChanged(String query) {
-    if (query.isEmpty) {
-      context.read<MoviesCubit>().getPopularMovies();
-    } else {
-      context.read<MoviesCubit>().searchMovies(query);
-    }
   }
 
   @override
@@ -45,11 +37,31 @@ class _HomeViewBodyState extends State<HomeViewBody> {
           children: [
             CustomSearchTextField(
               searchController: searchController,
-              onChanged: _onSearchChanged,
+              onChanged: (query) {
+                if (query.isEmpty) {
+                  context.read<MoviesCubit>().getPopularMovies();
+                } else {
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    if (query == searchController.text) {
+                      context.read<MoviesCubit>().searchMovies(query);
+                    }
+                  });
+                }
+              },
+              onCleared: () {
+                context.read<MoviesCubit>().getPopularMovies();
+              },
             ),
             const SizedBox(height: 16),
             Expanded(
               child: BlocBuilder<MoviesCubit, MoviesState>(
+                buildWhen: (previous, current) {
+                  // Only rebuild for home-related states
+                  return current is MoviesInitial ||
+                      current is MoviesLoading ||
+                      current is MoviesSuccess ||
+                      current is MoviesFailure;
+                },
                 builder: (context, state) {
                   if (state is MoviesFailure) {
                     return Center(
@@ -88,13 +100,10 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       ),
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              DetailsView.routeName,
-                              arguments:
-                                  state.movies[index],
-                            );
+                          onTap: () async {
+                            await Navigator.pushNamed(
+                                context, DetailsView.routeName,
+                                arguments: state.movies[index].id);
                           },
                           child: MovieItem(
                             imageUrl: state.movies[index].posterPath,

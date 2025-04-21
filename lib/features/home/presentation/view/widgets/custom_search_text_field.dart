@@ -1,32 +1,65 @@
 import 'package:flutter/material.dart';
 
-class CustomSearchTextField extends StatelessWidget {
+class CustomSearchTextField extends StatefulWidget {
   final TextEditingController searchController;
   final ValueChanged<String>? onChanged;
+  final VoidCallback? onCleared;
 
   const CustomSearchTextField({
     super.key,
     required this.searchController,
     this.onChanged,
+    this.onCleared,
   });
 
+  @override
+  State<CustomSearchTextField> createState() => _CustomSearchTextFieldState();
+}
+
+class _CustomSearchTextFieldState extends State<CustomSearchTextField> {
+
+  final FocusNode _focusNode = FocusNode();
+  bool _showClearButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.searchController.addListener(_updateClearButtonVisibility);
+  }
+
+  @override
+  void dispose() {
+    widget.searchController.removeListener(_updateClearButtonVisibility);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _updateClearButtonVisibility() {
+    setState(() {
+      _showClearButton = widget.searchController.text.isNotEmpty;
+    });
+  }
+
+  void _handleClear() {
+    widget.searchController.clear();
+    widget.onChanged?.call('');
+    widget.onCleared?.call();
+    _focusNode.requestFocus();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: TextField(
-        controller: searchController,
-        onChanged: onChanged,
+        controller: widget.searchController,
+        focusNode: _focusNode,
+        onChanged: (value) {
+          widget.onChanged?.call(value);
+          _updateClearButtonVisibility();
+        },
         style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
@@ -49,16 +82,13 @@ class CustomSearchTextField extends StatelessWidget {
             Icons.search,
             color: Color(0xFF9E9E9E),
           ),
-          suffixIcon: searchController.text.isNotEmpty
+          suffixIcon: _showClearButton
               ? IconButton(
             icon: const Icon(
               Icons.clear,
               color: Colors.white70,
             ),
-            onPressed: () {
-              searchController.clear();
-              onChanged?.call('');
-            },
+            onPressed: _handleClear,
           )
               : null,
         ),
